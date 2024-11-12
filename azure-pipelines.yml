@@ -7,7 +7,6 @@ trigger:
 - main
 
 pool:
-  # vmImage: ubuntu-latest
   name: Default
 
 strategy:
@@ -25,12 +24,30 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
+    githubToken: $(Token)
+    addToPath: true
+    architecture: 'x64'
   displayName: 'Use Python $(python.version)'
 
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
   displayName: 'Install dependencies'
+
+- task: ArchiveFiles@2
+  displayName: 'Archive files'
+  inputs:
+    rootFolderOrFile: $(System.DefaultWorkingDirectory)
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-$(python.version).zip
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
 
 - script: |
     pip install pytest pytest-azurepipelines
