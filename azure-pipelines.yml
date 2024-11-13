@@ -24,7 +24,7 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
-    githubToken: $(Token)
+    githubToken: '$(gh-token)'
     addToPath: true
     architecture: 'x64'
   displayName: 'Use Python $(python.version)'
